@@ -618,28 +618,29 @@ function saveData(){localStorage.setItem('euro_travel_attractions_v4_full',JSON.
 function initMap(){
   map = L.map('map',{zoomControl:true,attributionControl:true}).setView([46.5,8.5],4);
 
-  // 底图1：CartoDB Voyager（干净风格，默认）
+  // 底图1：CartoDB Voyager（干净风格）
   const voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
     maxZoom:19, subdomains:'abcd',
     attribution:'© OpenStreetMap contributors © CARTO'
   });
 
-  // 底图2：Esri World Street Map（POI标注最丰富，用于交叉核对）
+  // 底图2：Esri World Street Map（标注丰富，设为默认）
   const esriStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{
     maxZoom:19, attribution:'© Esri, HERE, Garmin, USGS'
   });
 
-  // 底图3：Esri 卫星影像（肉眼核对建筑轮廓）
+  // 底图3：Esri 卫星影像
   const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
     maxZoom:19, attribution:'© Esri, Maxar, Earthstar Geographics'
   });
 
-  voyager.addTo(map);
+  // 默认加载“标注丰富”（Esri Street）
+  esriStreet.addTo(map);
 
-  // 底图切换控件（右上角）
+  // 底图切换控件（右上角，顺序调整为标注丰富在第一个）
   L.control.layers({
+    "📍 标注丰富": esriStreet,  // 第一个，显示在最上方
     "🎨 干净底图": voyager,
-    "📍 标注丰富": esriStreet,
     "🛰️ 卫星影像": esriSat
   }, null, {position:'topright', collapsed:false}).addTo(map);
 
