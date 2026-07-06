@@ -617,10 +617,36 @@ function loadData(){
 function saveData(){localStorage.setItem('euro_travel_attractions_v4_full',JSON.stringify(attractions))}
 
 function initMap(){
-  map = L.map('map',{zoomControl:true,attributionControl:false}).setView([46.5,8.5],4);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+  map = L.map('map',{zoomControl:true,attributionControl:true}).setView([46.5,8.5],4);
+
+  // 底图1：CartoDB Voyager（干净风格，默认）
+  const voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+    maxZoom:19, subdomains:'abcd',
+    attribution:'© OpenStreetMap contributors © CARTO'
+  });
+
+  // 底图2：Esri World Street Map（POI标注最丰富，用于交叉核对）
+  const esriStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{
+    maxZoom:19, attribution:'© Esri, HERE, Garmin, USGS'
+  });
+
+  // 底图3：Esri 卫星影像（肉眼核对建筑轮廓）
+  const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+    maxZoom:19, attribution:'© Esri, Maxar, Earthstar Geographics'
+  });
+
+  voyager.addTo(map);
+
+  // 底图切换控件（右上角）
+  L.control.layers({
+    "🎨 干净底图": voyager,
+    "📍 标注丰富": esriStreet,
+    "🛰️ 卫星影像": esriSat
+  }, null, {position:'topright', collapsed:false}).addTo(map);
+
   map.on('zoomend', updateMarkerLabels);
 }
+
 
 function renderMapMarkers(){
   if(!map) return;
